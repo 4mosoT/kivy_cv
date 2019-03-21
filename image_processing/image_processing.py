@@ -1,5 +1,5 @@
 import cv2
-import imutils
+# import imutils
 import numpy as np
 
 
@@ -14,19 +14,26 @@ def crop_image(image):
 detector = cv2.CascadeClassifier('image_processing/cascades/haarcascade_frontalface_default.xml')
 
 
-def face_detection(image):
-    image = imutils.resize(image, width=300)
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    faceRects = detector.detectMultiScale(gray, scaleFactor=1.05, minNeighbors=5,
-                                          minSize=(30, 30), flags=cv2.CASCADE_SCALE_IMAGE)
+def face_detection(image, rect_color):
+    orig_image = image.copy()
+    height, width = orig_image.shape[:2]
 
-    # loop over the faces and draw a rectangle around each
-    mask = np.zeros(image.shape[:2], dtype='uint8')
+    new_width = 300
+    r = new_width / float(width)
+    dim = (new_width, int(height * r))
+    ratio = (width / dim[0], height / dim[1])
+    image = cv2.resize(image, dim)
+
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    faceRects = detector.detectMultiScale(image, scaleFactor=1.2, minNeighbors=5,
+                                          minSize=(20, 20), flags=cv2.CASCADE_SCALE_IMAGE)
+
     for (x, y, w, h) in faceRects:
-        cv2.rectangle(mask, (x, y), (x + w, y + h), 255, -1)
+        x = int(x * ratio[0])
+        y = int(y * ratio[1])
+        w = x + int(w * ratio[0])
+        h = y + int(h * ratio[1])
+        cv2.rectangle(orig_image, (x, y), (w, h), rect_color, 2)
 
-    image = cv2.bitwise_and(image, image, mask=mask)
-
-    return image
-
-
+    return orig_image, faceRects
