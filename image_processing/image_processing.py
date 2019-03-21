@@ -14,7 +14,13 @@ def crop_image(image):
 detector = cv2.CascadeClassifier('image_processing/cascades/haarcascade_frontalface_default.xml')
 
 
-def face_detection(image, rect_color):
+def face_detection(image, rect_color, rotation):
+
+    if rotation == 90:
+        image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    if rotation == -90:
+        image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+
     orig_image = image.copy()
     height, width = orig_image.shape[:2]
 
@@ -35,5 +41,10 @@ def face_detection(image, rect_color):
         w = x + int(w * ratio[0])
         h = y + int(h * ratio[1])
         cv2.rectangle(orig_image, (x, y), (w, h), rect_color, 2)
+
+    if rotation == 90:
+        orig_image = cv2.rotate(orig_image, cv2.ROTATE_90_CLOCKWISE)
+    if rotation == -90:
+        orig_image = cv2.rotate(orig_image, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
     return orig_image, faceRects

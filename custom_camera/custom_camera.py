@@ -11,9 +11,9 @@ import cv2
 class CustomCamera(Camera):
     detectFaces = BooleanProperty(False)
     angle = NumericProperty(0)
-
     def __init__(self, **kwargs):
         super(CustomCamera, self).__init__(**kwargs)
+
         self.isAndroid = kivy.platform == "android"
         if self.isAndroid:
             self.angle = -90
@@ -31,7 +31,7 @@ class CustomCamera(Camera):
         image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
 
         if self.detectFaces:
-            image, faceRect = face_detection(image, (0, 255, 0, 255))
+            image, faceRect = face_detection(image, (0, 255, 0, 255), self.angle)
 
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGBA)
         numpy_data = image.tostring()
